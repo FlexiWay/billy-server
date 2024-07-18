@@ -1,0 +1,32 @@
+steps:
+  # Build the Docker image
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "-t",
+        "gcr.io/konn3ct-3f166/konn3ct-server",
+        "-f",
+        "server/Dockerfile",
+        "server",
+      ]
+
+  # Push the Docker image to Google Container Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "gcr.io/konn3ct-3f166/konn3ct-server"]
+
+  # Deploy the image to Cloud Run
+  - name: "gcr.io/cloud-builders/gcloud"
+    args:
+      - "run"
+      - "deploy"
+      - "konn3ct-server"
+      - "--image"
+      - "gcr.io/konn3ct-3f166/konn3ct-server"
+      - "--region"
+      - "europe-west3"
+      - "--platform"
+      - "managed"
+timeout: "1600s"
+options:
+  logging: CLOUD_LOGGING_ONLY
